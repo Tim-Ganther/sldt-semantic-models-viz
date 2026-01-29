@@ -7,12 +7,13 @@ from urllib.parse import quote
 
 import requests
 from dotenv import load_dotenv
-from flask import Flask, Response, jsonify, render_template_string, request, send_from_directory
+from flask import Flask, Response, abort, jsonify, render_template_string, request, send_from_directory
 
 BASE_DIR = Path(__file__).resolve().parent
 WEB_DIR = BASE_DIR.parent / "web"
 INDEX_TEMPLATE = (WEB_DIR / "index.html").read_text(encoding="utf-8")
 DIFF_TEMPLATE = (WEB_DIR / "diff.html").read_text(encoding="utf-8")
+NOT_FOUND_TEMPLATE = (WEB_DIR / "404.html").read_text(encoding="utf-8")
 
 load_dotenv(BASE_DIR / ".env", override=False)
 
@@ -106,6 +107,8 @@ def index_file():
 @app.get("/models/<path:model>")
 @app.get("/models/<path:model>/versions/<path:version>")
 def model_view(model: str, version: str | None = None):
+    if not _is_valid_model_version(model, version):
+        abort(404)
     return _render_index(model, version)
 
 
@@ -114,6 +117,13 @@ def diff():
     model = request.args.get("model")
     source = request.args.get("from")
     target = request.args.get("to")
+    if model:
+        if not _is_valid_model_version(model, None):
+            abort(404)
+        if source and not _is_valid_model_version(model, source):
+            abort(404)
+        if target and not _is_valid_model_version(model, target):
+            abort(404)
     return render_template_string(DIFF_TEMPLATE, **_diff_meta(model, source, target))
 
 
@@ -192,6 +202,20 @@ def add_security_headers(response):
     return response
 
 
+@app.errorhandler(404)
+def not_found(error):
+    base_url = _external_base_url()
+    canonical_url = f"{base_url}{request.path}"
+    og_image_url = f"{base_url}{OG_IMAGE_PATH}"
+    payload = {
+        "page_title": f"Page not found | {BASE_TITLE}",
+        "page_description": "The requested URL does not exist. Browse the available models instead.",
+        "canonical_url": canonical_url,
+        "og_image_url": og_image_url,
+    }
+    return render_template_string(NOT_FOUND_TEMPLATE, **payload), 404
+
+
 def _fetch_tree(fallback_to_cache: bool = False):
     now = time.time()
     if _cache["data"] and now - _cache["timestamp"] < CACHE_TTL:
@@ -233,6 +257,20 @@ def _build_model_versions(tree: list[dict]) -> dict[str, set[str]]:
             continue
         models.setdefault(model, set()).add(version)
     return models
+
+
+def _is_valid_model_version(model: str | None, version: str | None) -> bool:
+    if not model:
+        return False
+    tree, _, _ = _fetch_tree(fallback_to_cache=True)
+    if not tree:
+        return True
+    model_versions = _build_model_versions(tree)
+    if model not in model_versions:
+        return False
+    if version and version not in model_versions[model]:
+        return False
+    return True
 
 
 def _external_base_url() -> str:
