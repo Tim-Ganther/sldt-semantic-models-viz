@@ -1,28 +1,28 @@
-# Tractus-X Semantic Models Viz
+# Semantic Models Viewer
 
-Minimal web viewer for the Tractus-X semantic models repository. It loads model metadata from the
-GitHub API, renders the generated SAMM diagram, exposes model attributes, and provides a dedicated
-version diff page.
+A lightweight, public-facing viewer for Aspect Models in the Eclipse Tractus-X Semantic Layer
+(SLDT). The app loads model metadata from GitHub, renders SAMM diagrams, surfaces attributes, and
+offers a dedicated version diff view.
 
 ## Features
-- Live model catalogue from `eclipse-tractusx/sldt-semantic-models` (main branch).
-- Attribute explorer with required-only toggle and example payload downloads.
-- Diagram viewer using the generated SAMM SVG with pan/zoom.
-- Dedicated diff page with summary + side-by-side SAMM source view.
+- Live catalogue from `eclipse-tractusx/sldt-semantic-models`.
+- Diagram viewer with pan/zoom and model metadata.
+- Attribute explorer with required-only filter and example payload downloads.
+- Version diff page with summary and side-by-side SAMM source.
+- SEO-ready routes with dynamic metadata and `sitemap.xml`.
 
-## Local setup
+## Getting started
+### Requirements
+- Python 3.12+
+- pip
+
+### Local development
 ```bash
 cd server
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.sample .env
-```
-
-Set a GitHub token for higher API limits:
-```
-GITHUB_TOKEN=your_token_here
-GITHUB_CACHE_TTL=300
 ```
 
 Run the server:
@@ -34,13 +34,21 @@ Open:
 - `http://localhost:5001`
 - `http://localhost:5001/diff`
 
+## Configuration
+Environment variables (runtime and Docker):
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| `GITHUB_TOKEN` | GitHub token for higher API limits | unset |
+| `GITHUB_CACHE_TTL` | Cache TTL for GitHub API responses (seconds) | `300` |
+
 ## Docker
 Build the image:
 ```bash
 docker build -t sldt-semantic-models-viz:local .
 ```
 
-Run (set env vars via Docker):
+Run (configure via env vars, no `.env` required):
 ```bash
 docker run --rm -p 5001:5001 \
   -e GITHUB_TOKEN=your_token_here \
@@ -48,10 +56,26 @@ docker run --rm -p 5001:5001 \
   sldt-semantic-models-viz:local
 ```
 
-## Security headers
-The Flask server ships with a restrictive CSP, no-sniff, and referrer policy headers. Adjust in
-`server/app.py` if you need to allow additional domains.
+## Container registry
+GitHub Actions publishes multi-arch images to GHCR when a tag is pushed:
 
-## Notes
-- The local clone of `sldt-semantic-models/` is intentionally ignored by git.
-- `server/.env` is ignored; use `.env.sample` as a template.
+```
+ghcr.io/tim-ganther/sldt-semantic-models-viz:<tag>
+ghcr.io/tim-ganther/sldt-semantic-models-viz:latest
+```
+
+## SEO routes
+- Model: `/models/<model>`
+- Version: `/models/<model>/versions/<version>`
+- Sitemap: `/sitemap.xml`
+
+## Security headers
+The Flask server ships with strict CSP, no-sniff, referrer policy, and related security headers.
+Adjust in `server/app.py` only if required.
+
+## Contributing
+Issues and PRs are welcome. Keep changes minimal, readable, and aligned with the existing visual
+language.
+
+## License
+BSD 2-Clause License. See `LICENSE`.

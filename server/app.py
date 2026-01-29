@@ -7,7 +7,7 @@ from urllib.parse import quote
 
 import requests
 from dotenv import load_dotenv
-from flask import Flask, jsonify, render_template_string, request, send_from_directory
+from flask import Flask, Response, jsonify, render_template_string, request, send_from_directory
 
 BASE_DIR = Path(__file__).resolve().parent
 WEB_DIR = BASE_DIR.parent / "web"
@@ -50,8 +50,9 @@ def _page_meta(model: str | None = None, version: str | None = None) -> dict[str
     else:
         title = BASE_TITLE
         description = BASE_DESCRIPTION
-    canonical_url = request.base_url
-    og_image_url = f"{request.url_root.rstrip('/')}{OG_IMAGE_PATH}"
+    base_url = _external_base_url()
+    canonical_url = f"{base_url}{request.path}"
+    og_image_url = f"{base_url}{OG_IMAGE_PATH}"
     return {
         "page_title": title,
         "page_description": description,
@@ -81,8 +82,9 @@ def _diff_meta(model: str | None, source: str | None, target: str | None) -> dic
         description = (
             "Compare semantic model versions in the Eclipse Tractus-X Semantic Layer (SLDT)."
         )
-    canonical_url = request.base_url
-    og_image_url = f"{request.url_root.rstrip('/')}{OG_IMAGE_PATH}"
+    base_url = _external_base_url()
+    canonical_url = f"{base_url}{request.path}"
+    og_image_url = f"{base_url}{OG_IMAGE_PATH}"
     return {
         "page_title": title,
         "page_description": description,
@@ -143,7 +145,7 @@ def sitemap():
     tree, _, _ = _fetch_tree(fallback_to_cache=True)
     tree = tree or []
     model_versions = _build_model_versions(tree)
-    base_url = request.url_root.rstrip("/")
+    base_url = _external_base_url()
     urls = ["/", "/diff"]
     for model in sorted(model_versions):
         urls.append(f"/models/{quote(model)}")
@@ -159,7 +161,8 @@ def sitemap():
         lines.append(f"    <loc>{base_url}{path}</loc>")
         lines.append("  </url>")
     lines.append("</urlset>")
-    return "\n".join(lines), 200, {"Content-Type": "application/xml"}
+    xml_body = "\n".join(lines)
+    return Response(xml_body, status=200, mimetype="application/xml")
 
 
 @app.after_request
@@ -230,6 +233,14 @@ def _build_model_versions(tree: list[dict]) -> dict[str, set[str]]:
             continue
         models.setdefault(model, set()).add(version)
     return models
+
+
+def _external_base_url() -> str:
+    scheme = request.headers.get("X-Forwarded-Proto", request.scheme)
+    scheme = scheme.split(",")[0].strip() or "https"
+    host = request.headers.get("X-Forwarded-Host", request.host)
+    host = host.split(",")[0].strip()
+    return f"{scheme}://{host}"
 
 
 if __name__ == "__main__":
