@@ -1,0 +1,11 @@
+.git
+.gitignore
+.github
+.DS_Store
+*.log
+server/.env
+server/.venv
+server/__pycache__
+sldt-semantic-models
+web/.Rhistory
+**/__pycache__

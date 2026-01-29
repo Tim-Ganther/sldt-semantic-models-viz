@@ -11,7 +11,7 @@ from flask import Flask, jsonify, request, send_from_directory
 BASE_DIR = Path(__file__).resolve().parent
 WEB_DIR = BASE_DIR.parent / "web"
 
-load_dotenv(BASE_DIR / ".env")
+load_dotenv(BASE_DIR / ".env", override=False)
 
 GITHUB_API_URL = (
     "https://api.github.com/repos/eclipse-tractusx/sldt-semantic-models/"

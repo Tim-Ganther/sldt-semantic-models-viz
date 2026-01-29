@@ -34,6 +34,20 @@ Open:
 - `http://localhost:5001`
 - `http://localhost:5001/diff`
 
+## Docker
+Build the image:
+```bash
+docker build -t sldt-semantic-models-viz:local .
+```
+
+Run (set env vars via Docker):
+```bash
+docker run --rm -p 5001:5001 \
+  -e GITHUB_TOKEN=your_token_here \
+  -e GITHUB_CACHE_TTL=300 \
+  sldt-semantic-models-viz:local
+```
+
 ## Security headers
 The Flask server ships with a restrictive CSP, no-sniff, and referrer policy headers. Adjust in
 `server/app.py` if you need to allow additional domains.
