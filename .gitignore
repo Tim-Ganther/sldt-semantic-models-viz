@@ -4,4 +4,5 @@ server/__pycache__/
 sldt-semantic-models/
 .DS_Store
 *.log
+server/server.log
 web/.Rhistory

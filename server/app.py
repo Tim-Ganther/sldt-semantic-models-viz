@@ -7,7 +7,7 @@ from urllib.parse import quote
 
 import requests
 from dotenv import load_dotenv
-from flask import Flask, Response, abort, jsonify, render_template_string, request, send_from_directory
+from flask import Flask, Response, abort, jsonify, redirect, render_template_string, request, send_from_directory
 
 BASE_DIR = Path(__file__).resolve().parent
 WEB_DIR = BASE_DIR.parent / "web"
@@ -33,6 +33,8 @@ BASE_DESCRIPTION = (
     "Explore Aspect Models for the Eclipse Tractus-X Semantic Layer (SLDT) and align on shared data contracts."
 )
 OG_IMAGE_PATH = "/assets/mindbehindit-og.webp"
+ALLOWED_STATIC_FILES = {"app.js", "diff.js", "styles.css"}
+ALLOWED_STATIC_DIRS = {"assets", "vendor"}
 
 
 def _page_meta(model: str | None = None, version: str | None = None) -> dict[str, str]:
@@ -127,6 +129,11 @@ def diff():
     return render_template_string(DIFF_TEMPLATE, **_diff_meta(model, source, target))
 
 
+@app.get("/diff.html")
+def diff_legacy():
+    return redirect("/diff", code=301)
+
+
 @app.get("/api/models")
 def models():
     tree, cached, error = _fetch_tree()
@@ -147,7 +154,14 @@ def models():
 
 @app.get("/<path:resource>")
 def assets(resource: str):
-    return send_from_directory(WEB_DIR, resource)
+    path = Path(resource)
+    if not path.parts:
+        abort(404)
+    if path.parts[0] in ALLOWED_STATIC_DIRS:
+        return send_from_directory(WEB_DIR, resource)
+    if resource in ALLOWED_STATIC_FILES:
+        return send_from_directory(WEB_DIR, resource)
+    abort(404)
 
 
 @app.get("/sitemap.xml")
