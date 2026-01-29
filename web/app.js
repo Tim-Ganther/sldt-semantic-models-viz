@@ -26,6 +26,13 @@ let activeSchema = null;
 let activeExample = null;
 
 const rawBase = "https://raw.githubusercontent.com/eclipse-tractusx/sldt-semantic-models/main/";
+const ogImageUrl = "https://mindbehind.it/wp-content/uploads/mindbehindit_og_image.webp";
+const baseTitle = "Tractus-X Semantic Models";
+const defaultMeta = {
+  title: "Explore Tractus-X Semantic Models",
+  description:
+    "Explore Tractus-X semantic models, review attributes, and compare versions to align on shared data contracts.",
+};
 
 const titleCase = (value) =>
   value
@@ -326,6 +333,34 @@ const updateViewer = () => {
   elements.modelOverview.innerHTML = "<div class=\"empty-state\"><p>Loading SAMM overview...</p></div>";
 };
 
+const updateMetaTag = (selector, value) => {
+  const element = document.querySelector(selector);
+  if (!element || !value) return;
+  element.setAttribute("content", value);
+};
+
+const updateLinkTag = (selector, value) => {
+  const element = document.querySelector(selector);
+  if (!element || !value) return;
+  element.setAttribute("href", value);
+};
+
+const buildMeta = () => {
+  if (activeModel && activeVersion) {
+    return {
+      title: `${activeModel.name} v${activeVersion} | ${baseTitle}`,
+      description: `Semantic model ${activeModel.name} version ${activeVersion}. Browse attributes, diagrams, and payload examples in the Tractus-X catalog.`,
+    };
+  }
+  if (activeModel) {
+    return {
+      title: `${activeModel.name} | ${baseTitle}`,
+      description: `Semantic model ${activeModel.name} in the Tractus-X catalog. Browse available versions, attributes, and diagrams.`,
+    };
+  }
+  return defaultMeta;
+};
+
 const renderOverview = (schema, example) => {
   if (!schema) {
     elements.modelOverview.innerHTML =
@@ -557,21 +592,48 @@ const fetchModels = async () => {
   return buildModels(data.tree || []);
 };
 
+const buildPath = (model, version) => {
+  if (!model) return "/";
+  const modelPath = `/models/${encodeURIComponent(model)}`;
+  if (!version) return modelPath;
+  return `${modelPath}/versions/${encodeURIComponent(version)}`;
+};
+
 const updateUrl = () => {
-  if (!activeModel || !activeVersion) return;
   const url = new URL(window.location.href);
-  url.searchParams.set("model", activeModel.name);
-  url.searchParams.set("version", activeVersion);
+  url.pathname = buildPath(activeModel?.name, activeVersion);
+  url.search = "";
   if (window.location.hash) {
     url.hash = window.location.hash;
   }
   window.history.replaceState({}, "", url);
+  const meta = buildMeta();
+  document.title = meta.title;
+  updateMetaTag("meta[name=description]", meta.description);
+  updateMetaTag("meta[property='og:title']", meta.title);
+  updateMetaTag("meta[property='og:description']", meta.description);
+  updateMetaTag("meta[property='og:url']", url.href);
+  updateMetaTag("meta[property='og:image']", ogImageUrl);
+  updateMetaTag("meta[name='twitter:title']", meta.title);
+  updateMetaTag("meta[name='twitter:description']", meta.description);
+  updateMetaTag("meta[name='twitter:image']", ogImageUrl);
+  updateLinkTag("link[rel='canonical']", url.href);
 };
 
 const hydrateFromUrl = () => {
   const url = new URL(window.location.href);
-  const model = url.searchParams.get("model");
-  const version = url.searchParams.get("version");
+  const segments = url.pathname.split("/").filter(Boolean);
+  let model = null;
+  let version = null;
+  if (segments[0] === "models") {
+    model = segments[1] ? decodeURIComponent(segments[1]) : null;
+    if (segments[2] === "versions" && segments[3]) {
+      version = decodeURIComponent(segments[3]);
+    }
+  } else {
+    model = url.searchParams.get("model");
+    version = url.searchParams.get("version");
+  }
   const hash = url.hash.replace("#", "");
   if (hash) {
     pendingAnchor = hash;
