@@ -26,7 +26,7 @@ let activeSchema = null;
 let activeExample = null;
 
 const rawBase = "https://raw.githubusercontent.com/eclipse-tractusx/sldt-semantic-models/main/";
-const ogImageUrl = "https://mindbehind.it/wp-content/uploads/mindbehindit_og_image.webp";
+const ogImageUrl = `${window.location.origin}/assets/mindbehindit-og.webp`;
 const baseTitle = "Tractus-X Semantic Models";
 const defaultMeta = {
   title: "Explore Tractus-X Semantic Models",

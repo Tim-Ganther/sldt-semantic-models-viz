@@ -26,7 +26,7 @@ _cache = {"timestamp": 0.0, "data": None}
 app = Flask(__name__, static_folder=str(WEB_DIR), static_url_path="")
 
 
-OG_IMAGE_URL = "https://mindbehind.it/wp-content/uploads/mindbehindit_og_image.webp"
+OG_IMAGE_PATH = "/assets/mindbehindit-og.webp"
 
 
 def _page_meta(model: str | None = None, version: str | None = None) -> dict[str, str]:
@@ -50,11 +50,12 @@ def _page_meta(model: str | None = None, version: str | None = None) -> dict[str
             "to align on shared data contracts."
         )
     canonical_url = request.base_url
+    og_image_url = f"{request.url_root.rstrip('/')}{OG_IMAGE_PATH}"
     return {
         "page_title": title,
         "page_description": description,
         "canonical_url": canonical_url,
-        "og_image_url": OG_IMAGE_URL,
+        "og_image_url": og_image_url,
     }
 
 
