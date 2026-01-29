@@ -3,7 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Semantic Models Diff</title>
+    <title>{{ page_title }}</title>
+    <meta name="description" content="{{ page_description }}" />
+    <link rel="canonical" href="{{ canonical_url }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="{{ page_title }}" />
+    <meta property="og:description" content="{{ page_description }}" />
+    <meta property="og:url" content="{{ canonical_url }}" />
+    <meta property="og:image" content="{{ og_image_url }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ page_title }}" />
+    <meta name="twitter:description" content="{{ page_description }}" />
+    <meta name="twitter:image" content="{{ og_image_url }}" />
     <link rel="icon" href="assets/mindbehindit-favicon.webp" type="image/webp" />
     <link rel="apple-touch-icon" href="assets/mindbehindit-favicon.webp" />
     <link rel="stylesheet" href="vendor/bootstrap.min.css" />
@@ -14,7 +25,7 @@
     <div class="page container-xxl">
       <header class="hero d-flex flex-column flex-lg-row align-items-lg-end">
         <div class="hero-copy">
-          <p class="eyebrow">Tractus-X Semantic Models</p>
+          <p class="eyebrow">Aspect Models for Eclipse Tractus-X Semantic Layer (SLDT)</p>
           <h1>Version comparison</h1>
           <p class="subhead">
             Compare attribute definitions between two versions of the same semantic model.

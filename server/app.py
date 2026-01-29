@@ -12,6 +12,7 @@ from flask import Flask, jsonify, render_template_string, request, send_from_dir
 BASE_DIR = Path(__file__).resolve().parent
 WEB_DIR = BASE_DIR.parent / "web"
 INDEX_TEMPLATE = (WEB_DIR / "index.html").read_text(encoding="utf-8")
+DIFF_TEMPLATE = (WEB_DIR / "diff.html").read_text(encoding="utf-8")
 
 load_dotenv(BASE_DIR / ".env", override=False)
 
@@ -26,29 +27,29 @@ _cache = {"timestamp": 0.0, "data": None}
 app = Flask(__name__, static_folder=str(WEB_DIR), static_url_path="")
 
 
+BASE_TITLE = "Aspect Models for Eclipse Tractus-X Semantic Layer (SLDT)"
+BASE_DESCRIPTION = (
+    "Explore Aspect Models for the Eclipse Tractus-X Semantic Layer (SLDT) and align on shared data contracts."
+)
 OG_IMAGE_PATH = "/assets/mindbehindit-og.webp"
 
 
 def _page_meta(model: str | None = None, version: str | None = None) -> dict[str, str]:
-    base_title = "Tractus-X Semantic Models"
     if model and version:
-        title = f"{model} v{version} | {base_title}"
+        title = f"{model} v{version} | {BASE_TITLE}"
         description = (
             f"Semantic model {model} version {version}. Browse attributes, diagrams, "
-            "and payload examples in the Tractus-X catalog."
+            "and payload examples in the Eclipse Tractus-X Semantic Layer (SLDT)."
         )
     elif model:
-        title = f"{model} | {base_title}"
+        title = f"{model} | {BASE_TITLE}"
         description = (
             f"Semantic model {model} in the Tractus-X catalog. Browse available versions, "
-            "attributes, and diagrams."
+            "attributes, and diagrams in the Eclipse Tractus-X Semantic Layer (SLDT)."
         )
     else:
-        title = "Explore Tractus-X Semantic Models"
-        description = (
-            "Explore Tractus-X semantic models, review attributes, and compare versions "
-            "to align on shared data contracts."
-        )
+        title = BASE_TITLE
+        description = BASE_DESCRIPTION
     canonical_url = request.base_url
     og_image_url = f"{request.url_root.rstrip('/')}{OG_IMAGE_PATH}"
     return {
@@ -61,6 +62,33 @@ def _page_meta(model: str | None = None, version: str | None = None) -> dict[str
 
 def _render_index(model: str | None = None, version: str | None = None):
     return render_template_string(INDEX_TEMPLATE, **_page_meta(model, version))
+
+
+def _diff_meta(model: str | None, source: str | None, target: str | None) -> dict[str, str]:
+    if model and source and target:
+        title = f"Diff {model} {source} to {target} | {BASE_TITLE}"
+        description = (
+            f"Compare semantic model {model} from {source} to {target} in the Eclipse Tractus-X "
+            "Semantic Layer (SLDT)."
+        )
+    elif model:
+        title = f"Diff {model} | {BASE_TITLE}"
+        description = (
+            f"Compare versions of semantic model {model} in the Eclipse Tractus-X Semantic Layer (SLDT)."
+        )
+    else:
+        title = f"Model diff | {BASE_TITLE}"
+        description = (
+            "Compare semantic model versions in the Eclipse Tractus-X Semantic Layer (SLDT)."
+        )
+    canonical_url = request.base_url
+    og_image_url = f"{request.url_root.rstrip('/')}{OG_IMAGE_PATH}"
+    return {
+        "page_title": title,
+        "page_description": description,
+        "canonical_url": canonical_url,
+        "og_image_url": og_image_url,
+    }
 
 
 @app.get("/")
@@ -81,7 +109,10 @@ def model_view(model: str, version: str | None = None):
 
 @app.get("/diff")
 def diff():
-    return send_from_directory(WEB_DIR, "diff.html")
+    model = request.args.get("model")
+    source = request.args.get("from")
+    target = request.args.get("to")
+    return render_template_string(DIFF_TEMPLATE, **_diff_meta(model, source, target))
 
 
 @app.get("/api/models")

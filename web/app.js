@@ -27,11 +27,11 @@ let activeExample = null;
 
 const rawBase = "https://raw.githubusercontent.com/eclipse-tractusx/sldt-semantic-models/main/";
 const ogImageUrl = `${window.location.origin}/assets/mindbehindit-og.webp`;
-const baseTitle = "Tractus-X Semantic Models";
+const baseTitle = "Aspect Models for Eclipse Tractus-X Semantic Layer (SLDT)";
 const defaultMeta = {
-  title: "Explore Tractus-X Semantic Models",
+  title: baseTitle,
   description:
-    "Explore Tractus-X semantic models, review attributes, and compare versions to align on shared data contracts.",
+    "Explore Aspect Models for the Eclipse Tractus-X Semantic Layer (SLDT) and align on shared data contracts.",
 };
 
 const titleCase = (value) =>
@@ -349,13 +349,13 @@ const buildMeta = () => {
   if (activeModel && activeVersion) {
     return {
       title: `${activeModel.name} v${activeVersion} | ${baseTitle}`,
-      description: `Semantic model ${activeModel.name} version ${activeVersion}. Browse attributes, diagrams, and payload examples in the Tractus-X catalog.`,
+      description: `Semantic model ${activeModel.name} version ${activeVersion}. Browse attributes, diagrams, and payload examples in the Eclipse Tractus-X Semantic Layer (SLDT).`,
     };
   }
   if (activeModel) {
     return {
       title: `${activeModel.name} | ${baseTitle}`,
-      description: `Semantic model ${activeModel.name} in the Tractus-X catalog. Browse available versions, attributes, and diagrams.`,
+      description: `Semantic model ${activeModel.name} in the Eclipse Tractus-X Semantic Layer (SLDT). Browse available versions, attributes, and diagrams.`,
     };
   }
   return defaultMeta;

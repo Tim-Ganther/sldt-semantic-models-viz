@@ -2,7 +2,7 @@ name: Publish Docker image
 
 on:
   push:
-    branches: ["main"]
+    tags: ["*"]
 
 permissions:
   contents: read
@@ -36,4 +36,5 @@ jobs:
           push: true
           tags: |
             ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.ref_name }}
             ${{ env.IMAGE }}:${{ github.sha }}
