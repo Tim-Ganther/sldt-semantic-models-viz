@@ -1,0 +1,7 @@
+server/.env
+server/.venv/
+server/__pycache__/
+sldt-semantic-models/
+.DS_Store
+*.log
+web/.Rhistory
