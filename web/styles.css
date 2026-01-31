@@ -182,6 +182,7 @@ h3 {
   scrollbar-gutter: stable;
   flex: 1;
   min-height: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 .model-card {
@@ -233,6 +234,25 @@ h3 {
 .model-card:hover p,
 .model-card.active p {
   color: var(--bg);
+}
+
+button,
+.model-card,
+.diff-tab,
+.overview-actions button,
+.hero-back,
+.diff-link,
+.repo-link,
+.attribute-link,
+.diagram-stage,
+.diff-back {
+  touch-action: manipulation;
+}
+
+input,
+select,
+textarea {
+  touch-action: manipulation;
 }
 
 .viewer {
@@ -343,6 +363,7 @@ h3 {
   font-family: "Courier New", monospace;
   font-size: 0.8rem;
   white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .attributes {
@@ -440,13 +461,240 @@ h3 {
   }
 }
 
+@media (max-width: 900px) {
+  .hero {
+    align-items: flex-start;
+  }
+
+  .status {
+    width: 100%;
+  }
+
+  .panel,
+  .viewer {
+    padding: 18px;
+  }
+
+  .viewer-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .viewer-actions {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .viewer-actions label {
+    width: 100%;
+  }
+
+  .model-list {
+    max-height: 48vh;
+  }
+}
+
 @media (max-width: 700px) {
   .page {
     padding: 24px 0 40px;
   }
 
+  .hero {
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .hero-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .hero-back {
+    width: 100%;
+    text-align: center;
+  }
+
+  .panel,
+  .viewer {
+    padding: 16px;
+  }
+
+  .status {
+    min-width: 0;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .model-card {
+    min-height: 56px;
+  }
+
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .overview-actions button {
+    width: 100%;
+  }
+
+  .attributes-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .attributes-controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .attributes-controls label {
+    width: 100%;
+  }
+
+  .attribute-link {
+    position: static;
+    margin-top: 10px;
+    display: inline-block;
+  }
+
+  .repo-link,
+  .diff-back,
+  .attribute-link {
+    padding: 8px 0;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .required-toggle input {
+    width: 18px;
+    height: 18px;
+  }
+
+  .diagram-canvas {
+    height: 240px;
+  }
+
+  .diff-config {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .diff-config .btn {
+    width: 100%;
+  }
+
+  .diff-config label {
+    width: 100%;
+  }
+
+  .diff-back {
+    margin-left: 0;
+  }
+
+  .diff-tabs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .diff-tab {
+    width: 100%;
+    text-align: center;
+  }
+
+  .diff-code-header {
+    grid-template-columns: 1fr;
+  }
+
+  .diff-code-row {
+    grid-template-columns: 1fr;
+  }
+
+  .diff-code-cell {
+    border-right: none;
+  }
+
   .agency-link img {
     width: 96px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 20px 0 32px;
+  }
+
+  .hero h1 {
+    font-size: 1.6rem;
+    line-height: 1.15;
+  }
+
+  .eyebrow {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+  }
+
+  .subhead {
+    font-size: 0.95rem;
+  }
+
+  .status {
+    padding: 12px;
+  }
+
+  .status-value {
+    font-size: 0.9rem;
+  }
+
+  .panel,
+  .viewer {
+    padding: 14px;
+  }
+
+  .model-list {
+    max-height: 42vh;
+  }
+
+  .form-control,
+  .form-select,
+  .btn,
+  .diff-tab,
+  .overview-actions button,
+  .hero-back,
+  .diff-link {
+    min-height: 44px;
+    font-size: 0.8rem;
+  }
+
+  .diff-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    text-decoration: none;
+    color: var(--ink);
+    width: 100%;
+    text-align: center;
+  }
+
+  .attribute-item {
+    padding: 12px;
+  }
+
+  .diff-code-cell {
+    font-size: 0.75rem;
   }
 }
 .overview-diagram {
@@ -762,6 +1010,28 @@ h3 {
   color: var(--bg);
 }
 
+@media (hover: none) {
+  .model-card:active {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .model-card:active p {
+    color: var(--bg);
+  }
+
+  .diff-tab:active,
+  .overview-actions button:active,
+  .hero-back:active,
+  .diff-link:active,
+  .repo-link:active,
+  .attribute-link:active,
+  .diff-back:active {
+    background: var(--ink);
+    color: var(--bg);
+  }
+}
+
 .diff-results.hidden {
   display: none;
 }
@@ -811,6 +1081,7 @@ h3 {
   font-size: 0.8rem;
   white-space: pre;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .diff-code-cell:last-child {
